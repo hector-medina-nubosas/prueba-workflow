@@ -18,3 +18,8 @@ jobs:
       - name: Browse dirs.
         run: |
           ls -la
+      
+      - name: python
+        run: |
+          NOMAD_TOKEN=12345
+          python3 script.py
