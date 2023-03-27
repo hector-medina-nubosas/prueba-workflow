@@ -22,4 +22,4 @@ jobs:
       - name: python
         run: |
           NOMAD_TOKEN=12345
-          python3 .github/workflow/script.py
+          python3 .github/workflows/script.py
