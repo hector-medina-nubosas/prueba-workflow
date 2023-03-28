@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+env:
+  NOMAD_URL: "http://142.93.129.1:4646"
+
 jobs:
   build:
     if: github.event.pull_request.merged == true
@@ -18,8 +21,17 @@ jobs:
       - name: Browse dirs.
         run: |
           ls -la
-      
+
+      - name: Get completed tasks from nomad job.
+        run: |
+          export complete=$(curl  -H 'Content-Type: application/json' \
+                                  --header "Authorization: Bearer ${{ secrets.NOMAD_TOKEN }}" \
+                                  -X POST ${{ env.NOMAD_URL }}/v1/jobs\?prefix\=turisapps-web-1 \
+                                  | jq -r '.[0].JobSummary.Summary."turisapps-web-1".Complete' )
+          echo "COMPLETE=$complete" >> $GITHUB_ENV
+
       - name: python
         run: |
-          export NOMAD_TOKEN=12345
+          echo ${{ env.COMPLETE }}
+          export NOMAD_TOKEN=${{ secrets.NOMAD_TOKEN }}
           python3 .github/workflows/script.py
