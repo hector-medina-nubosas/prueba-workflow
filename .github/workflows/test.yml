@@ -23,6 +23,13 @@ jobs:
           ls -la
 
       - name: Get completed tasks from nomad job.
+        id: complete1
+        run: |
+          curl  -H 'Content-Type: application/json' \
+                                  --header "Authorization: Bearer ${{ secrets.NOMAD_TOKEN }}" \
+                                  -X POST ${{ env.NOMAD_URL }}/v1/jobs\?prefix\=turisapps-web-1 
+
+      - name: Get completed tasks from nomad job.
         id: complete
         run: |
           export complete=$(curl  -H 'Content-Type: application/json' \
