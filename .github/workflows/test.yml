@@ -1,8 +1,6 @@
 name: Docker build and Nomad deployment.
 on:
   pull_request:
-    types:
-      - closed
     branches:
       - main
 
@@ -11,7 +9,6 @@ env:
 
 jobs:
   build:
-    if: github.event.pull_request.merged == true
     name: Docker image builds
     runs-on: ubuntu-latest
     steps:
