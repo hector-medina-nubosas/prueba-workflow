@@ -43,3 +43,8 @@ jobs:
           echo ${{ steps.complete.outputs.COMPLETE }}
           export NOMAD_TOKEN=${{ secrets.NOMAD_TOKEN }}
           python3 .github/workflows/script.py
+      
+      - uses: jwalton/gh-find-current-pr@v1
+        id: findPr
+        with:
+          state: all
