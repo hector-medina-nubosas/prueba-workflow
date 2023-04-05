@@ -45,3 +45,6 @@ jobs:
         id: findPr
         with:
           state: all
+      - name: cat
+        run: | 
+          cat .github/workflows/script.py
