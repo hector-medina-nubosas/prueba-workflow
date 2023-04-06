@@ -6,7 +6,6 @@ on:
   pull_request:
     branches:
 
-
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
