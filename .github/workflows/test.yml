@@ -26,19 +26,14 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Bump version and push tag
-        uses: hennejg/github-tag-action@v4.4.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=semver,pattern={{raw}}
+            type=raw,value=v0.0.1
 
       - name: Build production image
         uses: docker/build-push-action@v3
