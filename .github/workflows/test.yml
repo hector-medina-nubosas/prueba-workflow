@@ -1,53 +1,46 @@
 name: Docker build and Nomad deployment.
 on:
   pull_request:
+    types:
+      - closed
     branches:
       - main
 
 env:
-  NOMAD_URL: "http://142.93.129.1:4646"
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
     name: Docker image builds
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+    if: github.event.pull_request.merged == true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      
-      - name: Browse dirs.
-        run: |
-          ls -la
 
-      - name: Get completed tasks from nomad job.
-        id: complete1
-        run: |
-          curl  -H 'Content-Type: application/json' \
-                                  --header "Authorization: Bearer ${{ secrets.NOMAD_TOKEN }}" \
-                                  ${{ env.NOMAD_URL }}/v1/jobs\?prefix\=turisapps-web-1 
-
-      - name: Get completed tasks from nomad job.
-        id: complete
-        run: |
-          export complete=$(curl  -H 'Content-Type: application/json' \
-                                  --header "Authorization: Bearer ${{ secrets.NOMAD_TOKEN }}" \
-                                  ${{ env.NOMAD_URL }}/v1/jobs\?prefix\=turisapps-web-1 \
-                                  | jq -r '.[0].JobSummary.Summary."turisapps-web-1".Complete' )
-          echo "COMPLETE=$complete" >> $GITHUB_OUTPUT
-
-      - name: python
-        run: |
-          echo ${{ steps.complete.outputs.COMPLETE }}
-          export NOMAD_TOKEN=${{ secrets.NOMAD_TOKEN }}
-          python3 .github/workflows/script.py
-      
-      - uses: jwalton/gh-find-current-pr@v1
-        id: findPr
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
         with:
-          state: all
-      - name: cat
-        run: | 
-          cat .github/workflows/script.py
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build production image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
