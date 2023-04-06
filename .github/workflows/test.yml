@@ -1,10 +1,12 @@
 name: Docker build and Nomad deployment.
 on:
-  push:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - closed
     branches:
       - main
-  pull_request:
-    branches:
 
 env:
   REGISTRY: ghcr.io
@@ -19,6 +21,7 @@ jobs:
         run: |
           echo "${{ github.event_name != 'pull_request' }}"
           echo "github merge:  ${{ github.event.pull_request.merged == true }}"
+          echo "hola"
     # - name: Checkout repository
     #   uses: actions/checkout@v3
 
