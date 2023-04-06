@@ -1,10 +1,10 @@
 name: Docker build and Nomad deployment.
 on:
-  pull_request:
-    types:
-      - closed
+  push:
     branches:
       - main
+  pull_request:
+    branches:
 
 
 env:
@@ -15,7 +15,6 @@ jobs:
   build:
     name: Docker image builds
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -39,7 +38,7 @@ jobs:
       - name: Build production image
         uses: docker/build-push-action@v3
         with:
-          push: true
+          push: ${{ github.event.pull_request.merged == true }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
