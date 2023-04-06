@@ -30,6 +30,8 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=v1.0.0
 
       - name: Build production image
         uses: docker/build-push-action@v3
